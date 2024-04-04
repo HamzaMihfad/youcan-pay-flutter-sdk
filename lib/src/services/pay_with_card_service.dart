@@ -25,10 +25,10 @@ class PayWithCardService extends BasedService {
     params['token_id'] = token;
     params['pub_key'] = pubKey;
     params['is_mobile'] = "1";
+    params['payment_method[type]'] = "credit_card";
 
     try {
-      HttpResponse response =
-          await httpAdapter.post(url: Constants.payWithCardUrl, body: params);
+      HttpResponse response = await httpAdapter.post(url: Constants.payWithCardUrl, body: params);
       YCPayResponse ycPayResponse = YCPResponseFactory.fromJSON(response);
 
       if (ycPayResponse is YCPResponseSale) {
@@ -44,9 +44,7 @@ class PayWithCardService extends BasedService {
 
       if (ycPayResponse is YCPResponse3ds) {
         on3dsPayment(
-            onFailedPayment: onFailedPayment,
-            onSuccessfulPayment: onSuccessfulPayment,
-            response: ycPayResponse);
+            onFailedPayment: onFailedPayment, onSuccessfulPayment: onSuccessfulPayment, response: ycPayResponse);
 
         return;
       }

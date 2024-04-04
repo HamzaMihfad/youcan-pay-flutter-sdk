@@ -25,7 +25,7 @@ class PayWithCardService extends BasedService {
     params['token_id'] = token;
     params['pub_key'] = pubKey;
     params['is_mobile'] = "1";
-    params['payment_method[type]'] = "credit_card";
+    params['payment_method[type]'] = '{"type": "credit_card"}';
 
     try {
       HttpResponse response = await httpAdapter.post(url: Constants.payWithCardUrl, body: params);

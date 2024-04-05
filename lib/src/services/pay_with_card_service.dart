@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../../youcanpay_sdk.dart';
@@ -21,14 +22,26 @@ class PayWithCardService extends BasedService {
       required CardInformation cardInformation,
       required Function(String? transactionId) onSuccessfulPayment,
       required Function(String? message) onFailedPayment}) async {
-    Map<String, String> params = CardInformationFactory.toMap(cardInformation);
-    params['token_id'] = token;
-    params['pub_key'] = pubKey;
-    params['is_mobile'] = "1";
-    params['payment_method'] = '{"type": "credit_card"}';
+    // Map<String, String> params = CardInformationFactory.toMap(cardInformation);
+    // params['token_id'] = token;
+    // params['pub_key'] = pubKey;
+    // params['is_mobile'] = "1";
+    // params['payment_method'] = '[{"type": "credit_card"}]';
+
+    var formData = FormData.fromMap({
+      'pub_key': pubKey,
+      'token_id': token,
+      'expire_date':
+          '${cardInformation.expireDateMonth.padLeft(2, '0')}/${cardInformation.expireDateYear.padLeft(2, '0')}',
+      'credit_card': cardInformation.cardNumber,
+      'cvv': cardInformation.cvv,
+      'card_holder_name': cardInformation.cardHolderName,
+      'payment_method[type]': 'credit_card',
+      'is_mobile': '1',
+    });
 
     try {
-      HttpResponse response = await httpAdapter.post(url: Constants.payWithCardUrl, body: params);
+      HttpResponse response = await httpAdapter.post(url: Constants.payWithCardUrl, body: formData);
       YCPayResponse ycPayResponse = YCPResponseFactory.fromJSON(response);
 
       if (ycPayResponse is YCPResponseSale) {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../youcanpay_sdk.dart';
 import '../configs/constants.dart';
-import '../factories/card_information_factory.dart';
 import '../factories/ycp_response_factory.dart';
 import '../models/http_response.dart';
 import '../models/ycp_response_3ds.dart';
@@ -22,11 +21,6 @@ class PayWithCardService extends BasedService {
       required CardInformation cardInformation,
       required Function(String? transactionId) onSuccessfulPayment,
       required Function(String? message) onFailedPayment}) async {
-    // Map<String, String> params = CardInformationFactory.toMap(cardInformation);
-    // params['token_id'] = token;
-    // params['pub_key'] = pubKey;
-    // params['is_mobile'] = "1";
-    // params['payment_method'] = '[{"type": "credit_card"}]';
 
     var formData = FormData.fromMap({
       'pub_key': pubKey,

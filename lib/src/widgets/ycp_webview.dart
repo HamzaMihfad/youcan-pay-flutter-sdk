@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
+import '../models/ycp_response_3ds.dart';
+import '../localization/ycpay_strings.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../exceptions/invalid_response_exception.dart';
-import '../localization/ycpay_strings.dart';
-import '../models/ycp_response_3ds.dart';
 
 class YCPWebView extends StatefulWidget {
   final Function(String? transactionId) onSuccessfulPayment;
   final Function(String? message) onFailedPayment;
   final YCPResponse3ds response;
 
-  const YCPWebView(
-      {Key? key,
-      required this.response,
-      required this.onSuccessfulPayment,
-      required this.onFailedPayment})
+  const YCPWebView({Key? key, required this.response, required this.onSuccessfulPayment, required this.onFailedPayment})
       : super(key: key);
 
   @override
@@ -29,6 +25,30 @@ class _YCPWebViewState extends State<YCPWebView> {
 
   @override
   Widget build(BuildContext context) {
+    WebViewController controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {
+            // Update loading bar.
+          },
+          onPageStarted: (String url) {
+            urlListener(url);
+          },
+          onPageFinished: (String url) {},
+          onHttpError: (HttpResponseError error) {},
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('https://...')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      )
+      ..loadRequest(Uri.parse(response.redirectUrl));
+
     return Column(
       children: [
         Container(
@@ -50,14 +70,7 @@ class _YCPWebViewState extends State<YCPWebView> {
           ),
         ),
         Expanded(
-          child: WebView(
-            initialUrl: response.redirectUrl,
-            javascriptMode: JavascriptMode.unrestricted,
-            gestureNavigationEnabled: true,
-            onPageStarted: (url) {
-              urlListener(url);
-            },
-          ),
+          child: WebViewWidget(controller: controller),
         ),
       ],
     );
